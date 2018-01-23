@@ -5,7 +5,7 @@ from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter, OAuth2Ca
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 
-from .provider import EspooADFSProvider, HelsinkiADFSProvider
+from .provider import EspooADFSProvider, HelsinkiADFSProvider, TampereADFSProvider
 
 x509_backend = default_backend()
 
@@ -152,4 +152,39 @@ class EspooADFSOAuth2Adapter(ADFSOAuth2Adapter):
                     val = val.lower()
                 attrs[out_name] = val
             attrs[out_name] = val
+        return attrs
+
+
+class TampereADFSOAuth2Adapter(ADFSOAuth2Adapter):
+    provider_id = TampereADFSProvider.id
+    realm = 'tampere'
+    access_token_url = 'https://sts.tampereenseutu.fi/adfs/oauth2/token'
+    authorize_url = 'https://sts.tampereenseutu.fi/adfs/oauth2/authorize'
+    profile_url = 'https://auth.tampere.fi/user/'
+
+    cert = (
+        ''
+        ''
+    )
+
+    def clean_attributes(self, attrs_in):
+        attr_map = {
+            'primarysid': 'primary_sid',
+            'given_name': 'first_name',
+            'family_name': 'last_name',
+            'email': 'email',
+        }
+
+        # Convert attribute names to lowercase
+        attrs_in = {k.lower(): v for k, v in attrs_in.items()}
+
+        attrs = {}
+        for in_name, out_name in attr_map.items():
+            val = attrs_in.get(in_name, None)
+            if val is not None:
+                if out_name in ('department_name', 'email', 'username'):
+                    val = val.lower()
+                attrs[out_name] = val
+            attrs[out_name] = val
+
         return attrs
