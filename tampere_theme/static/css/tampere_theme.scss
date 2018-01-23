@@ -1,0 +1,71 @@
+// Font awesome
+$fa-font-path: "../fonts/font-awesome";
+@import "font-awesome/scss/font-awesome";
+
+// Tampere fonts
+@import url('//fonts.googleapis.com/css?family=Lato:400,700|Open+Sans:400,700');
+
+// Tampere brand variables
+@import "_variables";
+
+// Bootstrap
+@import "bootstrap-sass/assets/stylesheets/bootstrap";
+
+// Bootstrap Social
+@import "bootstrap-social/bootstrap-social.scss";
+
+// ------------------------------------------------------
+// Tunnistamo styles
+
+body {
+  background: $tre-blue;
+}
+
+.content-container {
+  margin-top: $grid-gutter-width;
+}
+
+.content-card {
+  padding: $grid-gutter-width;
+  background-color: #fff;
+  box-shadow: 0px 0px 15px rgba(#000, 0.15);
+  border-radius: $border-radius-small;
+  @extend .clearfix;
+
+  header {
+    @extend .clearfix;
+    border-bottom: 1px solid $border-color;
+    padding-bottom: $grid-gutter-width / 2;
+
+    .service-title {
+      margin-top: 0;
+      font-size: $font-size-h4;
+      font-weight: bold;
+    }
+
+    .logo {
+      height: 2.6em;
+      margin: -0.5em 0 0 0;
+      float: right;
+    }
+  }
+}
+
+.login-method {
+  margin-bottom: $grid-gutter-width / 2;
+
+  .short-description {
+    margin-top: 6px;
+  }
+
+  .ext-icon img {
+    max-height: 24px;
+    max-width: 24px;
+  }
+}
+
+.login-method__primary {
+  border-bottom: 1px solid $border-color;
+  border-top: 1px solid $border-color;
+  padding-top: $grid-gutter-width / 2;
+}
