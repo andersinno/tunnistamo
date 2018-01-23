@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'rest_framework',
     'corsheaders',
     'helsinki_theme',
+    'tampere_theme',
     'bootstrap3',
 
     'helusers',
