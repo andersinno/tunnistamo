@@ -7,6 +7,7 @@ from django.contrib import admin
 from django.contrib.staticfiles import views as static_views
 from django.http import HttpResponse
 from django.views.defaults import permission_denied
+from django.views.generic import TemplateView
 
 from oidc_apis.views import get_api_tokens_view
 from users.views import EmailNeededView, LoginView, LogoutView
@@ -28,15 +29,6 @@ def show_login(request):
         html += "not logged in"
     html += "</body></html>"
     return HttpResponse(html)
-
-
-class CustomAuthorizeView(AuthorizeView):
-    def get(self, request, *args, **kwargs):
-        response = super().get(request, *args, **kwargs)
-
-        request.session.modified = True
-
-        return response
 
 
 urlpatterns = [
