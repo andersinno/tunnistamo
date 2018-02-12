@@ -30,7 +30,17 @@ def show_login(request):
     return HttpResponse(html)
 
 
+class CustomAuthorizeView(AuthorizeView):
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+
+        request.session.modified = True
+
+        return response
+
+
 urlpatterns = [
+    url(r'^$', TemplateView.as_view(template_name='tampere_theme/index.html')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api-tokens/?$', get_api_tokens_view),
     url(r'^accounts/profile/', show_login),
