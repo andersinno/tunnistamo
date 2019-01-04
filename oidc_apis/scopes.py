@@ -99,7 +99,7 @@ class ReducedStandardScopeClaims(StandardScopeClaims):
         }
 
         return dic
-    
+
     def scope_email(self):
         return super().scope_email()
 
