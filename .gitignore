@@ -1,5 +1,6 @@
 *~
 *.pyc
+*.mo
 /db.sqlite3
 /.django_secret
 /local_settings.py
@@ -9,3 +10,5 @@
 .python-version
 .coverage
 .cache
+.idea
+/data

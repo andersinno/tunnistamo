@@ -1,16 +1,29 @@
-import allauth.urls
 import oauth2_provider.urls
 import oidc_provider.urls
 from django.conf import settings
-from django.conf.urls import include, url
+from django.conf.urls.static import static
 from django.contrib import admin
-from django.contrib.staticfiles import views as static_views
 from django.http import HttpResponse
+from django.urls import include, path, re_path
+from django.utils import translation
 from django.views.defaults import permission_denied
 from django.views.generic import TemplateView
+from oidc_provider.views import ProviderInfoView as OIDCProviderInfoView
+from rest_framework.documentation import include_docs_urls
+from rest_framework.routers import SimpleRouter
+from rest_framework.schemas import SchemaGenerator
 
+import auth_backends.urls
+from devices.api import UserDeviceViewSet
+from identities.api import UserIdentityViewSet
 from oidc_apis.views import get_api_tokens_view
-from users.views import EmailNeededView, LoginView, LogoutView
+from scopes.api import ScopeListView
+from services.api import ServiceViewSet
+from tunnistamo import social_auth_urls
+from users.api import TunnistamoAuthorizationView, UserConsentViewSet, UserLoginEntryViewSet
+from users.views import (
+    EmailNeededView, LoginView, LogoutView, TunnistamoOidcAuthorizeView, TunnistamoOidcEndSessionView
+)
 
 from .api import GetJWTView, UserView
 
@@ -31,24 +44,48 @@ def show_login(request):
     return HttpResponse(html)
 
 
+class AllEnglishSchemaGenerator(SchemaGenerator):
+    def get_schema(self, *args, **kwargs):
+        with translation.override('en'):
+            return super().get_schema(*args, **kwargs)
+
+
+router = SimpleRouter()
+router.register('user_identity', UserIdentityViewSet)
+router.register('user_device', UserDeviceViewSet)
+router.register('user_login_entry', UserLoginEntryViewSet)
+router.register('service', ServiceViewSet)
+router.register('user_consent', UserConsentViewSet)
+
+v1_scope_path = path('scope/', ScopeListView.as_view(), name='scope-list')
+v1_api_path = path('v1/', include((router.urls + [v1_scope_path], 'v1')))
+
 urlpatterns = [
-    url(r'^$', TemplateView.as_view(template_name='tampere_theme/index.html')),
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^api-tokens/?$', get_api_tokens_view),
-    url(r'^accounts/profile/', show_login),
-    url(r'^accounts/login/', LoginView.as_view()),
-    url(r'^accounts/logout/', LogoutView.as_view()),
-    url(r'^accounts/', include(allauth.urls)),
-    url(r'^oauth2/applications/', permission_denied),
-    url(r'^oauth2/', include(oauth2_provider.urls, namespace='oauth2_provider')),
-    url(r'^openid/', include(oidc_provider.urls, namespace='oidc_provider')),
-    url(r'^user/(?P<username>[\w.@+-]+)/?$', UserView.as_view()),
-    url(r'^user/$', UserView.as_view()),
-    url(r'^jwt-token/$', GetJWTView.as_view()),
-    url(r'^login/$', LoginView.as_view()),
-    url(r'^logout/$', LogoutView.as_view()),
-    url(r'^email-needed/$', EmailNeededView.as_view(), name='email_needed'),
+    path('', TemplateView.as_view(template_name='tampere_theme/index.html')),
+    path('admin/', admin.site.urls),
+    path('api-tokens/', get_api_tokens_view),
+    path('accounts/profile/', show_login),
+    path('accounts/login/', LoginView.as_view()),
+    path('accounts/logout/', LogoutView.as_view()),
+    path('accounts/', include(auth_backends.urls, namespace='auth_backends')),
+    path('accounts/', include(social_auth_urls, namespace='social')),
+    path('oauth2/applications/', permission_denied),
+    path('oauth2/authorize/', TunnistamoAuthorizationView.as_view(), name="oauth2_authorize"),
+    path('oauth2/', include(oauth2_provider.urls, namespace='oauth2_provider')),
+    re_path(r'^openid/authorize/?$', TunnistamoOidcAuthorizeView.as_view(), name='authorize'),
+    re_path(r'^openid/end-session/?$', TunnistamoOidcEndSessionView.as_view(), name='end-session'),
+    path('openid/', include(oidc_provider.urls, namespace='oidc_provider')),
+    re_path(r'^\.well-known/openid-configuration/?$', OIDCProviderInfoView.as_view(), name='root-provider-info'),
+    re_path(r'^user/(?P<username>[\w.@+-]+)/?$', UserView.as_view()),
+    path('user/', UserView.as_view()),
+    path('jwt-token/', GetJWTView.as_view()),
+    path('login/', LoginView.as_view()),
+    path('logout/', LogoutView.as_view()),
+    path('email-needed/', EmailNeededView.as_view(), name='email_needed'),
+    v1_api_path,
+    path('docs/', include_docs_urls(title='Tunnistamo API v1', patterns=[v1_api_path],
+                                    generator_class=AllEnglishSchemaGenerator)),
 ]
 
 if settings.DEBUG:
-    urlpatterns += [url(r'^static/(?P<path>.*)$', static_views.serve)]
+    static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

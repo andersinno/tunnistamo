@@ -1,8 +1,13 @@
+import re
+
 from django.utils.translation import ugettext_lazy as _
 from oidc_provider.lib.claims import ScopeClaims, StandardScopeClaims
+from oidc_provider.lib.errors import BearerTokenError
+from social_django.models import UserSocialAuth
+
+from auth_backends.models import SuomiFiAccessLevel
 
 from .models import ApiScope
-from .utils import combine_uniquely
 
 
 class ApiScopeClaims(ScopeClaims):
@@ -38,16 +43,120 @@ class GithubUsernameScopeClaims(ScopeClaims):
         }
 
 
+class DevicesScopeClaims(ScopeClaims):
+    info_devices = (
+        _('Devices'), _('Permission to link devices to your user account identities.'))
+
+
+class IdentitiesScopeClaims(ScopeClaims):
+    info_identities = (
+        _('Identities'), _('Access to cards and other identity information.'))
+
+
+class LoginEntriesScopeClaims(ScopeClaims):
+    info_login_entries = (
+        _('Login history'), _('Access to your login history.'))
+
+
+class UserConsentsScopeClaims(ScopeClaims):
+    info_user_consents = (
+        _('Consents'), _('Permission to view and delete your consents for services.'))
+
+
+class AdGroupsScopeClaims(ScopeClaims):
+    info_ad_groups = (_("AD Groups"), _("Access to your AD Group memberships."))
+
+    def scope_ad_groups(self):
+        return {
+            'ad_groups': list(self.user.ad_groups.all().values_list('name', flat=True)),
+        }
+
+
+class CustomInfoTextStandardScopeClaims(StandardScopeClaims):
+    info_profile = (
+        _('Basic profile'),
+        _('Access to your basic information. Includes names, gender, birthdate and other information.'),
+    )
+    info_email = (
+        _('Email'),
+        _('Access to your email address.'),
+    )
+    info_phone = (
+        _('Phone number'),
+        _('Access to your phone number.'),
+    )
+    info_address = (
+        _('Address information'),
+        _('Access to your address. Includes country, locality, street and other information.'),
+    )
+
+    def scope_profile(self):
+        return super().scope_profile()
+
+    def scope_email(self):
+        return super().scope_email()
+
+    def scope_phone(self):
+        return super().scope_phone()
+
+    def scope_address(self):
+        return super().scope_address()
+
+
+class SuomiFiUserAttributeScopeClaimsMeta(type):
+    def __dir__(cls):
+        names = super().__dir__()
+        for level in SuomiFiAccessLevel.objects.all():
+            names.append('info_suomifi_' + level.shorthand)
+        return names
+
+    def __getattr__(cls, name):
+        match = re.match(r'^info_suomifi_(.*)', name)
+        if match:
+            try:
+                level = SuomiFiAccessLevel.objects.get(shorthand=match.group(1))
+                return (level.name, level.description)
+            except SuomiFiAccessLevel.DoesNotExist:
+                raise AttributeError()
+        return super().__getattr__(name)
+
+
+class SuomiFiUserAttributeScopeClaims(ScopeClaims, metaclass=SuomiFiUserAttributeScopeClaimsMeta):
+    def create_response_dic(self):
+        dic = {}
+        try:
+            social_user = UserSocialAuth.objects.get(user=self.user)
+        except UserSocialAuth.DoesNotExist:
+            return dic
+        for level in SuomiFiAccessLevel.objects.all():
+            scope = 'suomifi_' + level.shorthand
+            if scope in self.scopes:
+                if scope not in self.client.scope:
+                    raise BearerTokenError('insufficient_scope')
+                dic[scope] = {}
+                for attribute in level.attributes.all():
+                    if attribute.friendly_name in social_user.extra_data['suomifi_attributes']:
+                        dic[scope][attribute.friendly_name] = \
+                            social_user.extra_data['suomifi_attributes'][attribute.friendly_name]
+        dic = self._clean_dic(dic)
+        return dic
+
+
 class CombinedScopeClaims(ScopeClaims):
     combined_scope_claims = [
-        StandardScopeClaims,
+        CustomInfoTextStandardScopeClaims,
         GithubUsernameScopeClaims,
         ApiScopeClaims,
+        DevicesScopeClaims,
+        IdentitiesScopeClaims,
+        LoginEntriesScopeClaims,
+        AdGroupsScopeClaims,
+        SuomiFiUserAttributeScopeClaims,
     ]
 
     @classmethod
     def get_scopes_info(cls, scopes=[]):
-        extended_scopes = cls._extend_scope(scopes)
+        extended_scopes = ApiScope.extend_scope(scopes)
         scopes_info_map = {}
         for claim_cls in cls.combined_scope_claims:
             for info in claim_cls.get_scopes_info(extended_scopes):
@@ -58,51 +167,13 @@ class CombinedScopeClaims(ScopeClaims):
             if scope in scopes_info_map
         ]
 
-    @classmethod
-    def _extend_scope(cls, scopes):
-        required_scopes = cls._get_all_required_scopes_by_api_scopes(scopes)
-        extended_scopes = combine_uniquely(scopes, sorted(required_scopes))
-        return extended_scopes
-
-    @classmethod
-    def _get_all_required_scopes_by_api_scopes(cls, scopes):
-        api_scopes = ApiScope.objects.by_identifiers(scopes)
-        apis = {x.api for x in api_scopes}
-        return set(sum((list(api.required_scopes) for api in apis), []))
+    def __init__(self, token, *args, **kwargs):
+        self._token = token
+        super().__init__(token, *args, **kwargs)
 
     def create_response_dic(self):
         result = super(CombinedScopeClaims, self).create_response_dic()
-        token = FakeToken.from_claims(self)
         for claim_cls in self.combined_scope_claims:
-            claim = claim_cls(token)
+            claim = claim_cls(self._token)
             result.update(claim.create_response_dic())
         return result
-
-
-class FakeToken(object):
-    """
-    Object that adapts a token.
-
-    ScopeClaims constructor needs a token, but really uses just its
-    user, scope and client attributes.  This adapter makes it possible
-    to create a token like object from those three attributes or from a
-    claims object (which doesn't store the token) allowing it to be
-    passed to a ScopeClaims constructor.
-    """
-    def __init__(self, user, scope, client):
-        self.user = user
-        self.scope = scope
-        self.client = client
-
-    @classmethod
-    def from_claims(cls, claims):
-        return cls(claims.user, claims.scopes, claims.client)
-
-
-def get_userinfo_by_scopes(user, scopes, client=None):
-    token = FakeToken(user, scopes, client)
-    return _get_userinfo_by_token(token)
-
-
-def _get_userinfo_by_token(token):
-    return CombinedScopeClaims(token).create_response_dic()
