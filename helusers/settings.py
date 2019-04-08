@@ -33,7 +33,7 @@ _defaults = dict(
     AUTH_SCHEME='Bearer',
 
     # Function for resolving users
-    USER_RESOLVER='helusers.oidc.resolve_user',
+    USER_RESOLVER='tunnistamo_users.oidc.resolve_user',
 
     # OIDC config expiration time
     OIDC_CONFIG_EXPIRATION_TIME=24 * 60 * 60

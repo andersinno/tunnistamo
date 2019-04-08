@@ -2,11 +2,11 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand
 from allauth.socialaccount.models import SocialApp
-from helusers.providers.helsinki.provider import HelsinkiProvider
+from tunnistamo_users.providers.helsinki.provider import HelsinkiProvider
 
 
 class Command(BaseCommand):
-    help = 'Create or update helusers allauth SocialApp'
+    help = 'Create or update tunnistamo_users allauth SocialApp'
 
     def handle(self, *args, **options):
         changed = False

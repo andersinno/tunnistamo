@@ -2,7 +2,7 @@ from allauth.socialaccount import providers
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
 
-from helusers.utils import uuid_to_username
+from tunnistamo_users.utils import uuid_to_username
 
 
 class HelsinkiAccount(ProviderAccount):
@@ -20,7 +20,7 @@ class HelsinkiAccount(ProviderAccount):
 class HelsinkiProvider(OAuth2Provider):
     id = 'helsinki'
     name = 'City of Helsinki employees'
-    package = 'helusers.providers.helsinki'
+    package = 'tunnistamo_users.providers.helsinki'
     account_class = HelsinkiAccount
 
     def extract_uid(self, data):

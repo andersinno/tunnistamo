@@ -9,9 +9,9 @@ with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
-    name='django-helusers',
+    name='django-tunnistamo-users',
     version='0.4.5',
-    packages=['helusers'],
+    packages=['tunnistamo_users'],
     include_package_data=True,
     license='BSD License',
     description='Django app for the user infrastructure of the City of Helsinki',

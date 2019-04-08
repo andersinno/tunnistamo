@@ -2,8 +2,8 @@ from allauth.socialaccount import providers
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
 
-from helusers.user_utils import oidc_to_user_data
-from helusers.utils import uuid_to_username
+from tunnistamo_users.user_utils import oidc_to_user_data
+from tunnistamo_users.utils import uuid_to_username
 
 
 class HelsinkiOIDCAccount(ProviderAccount):
@@ -21,7 +21,7 @@ class HelsinkiOIDCAccount(ProviderAccount):
 class HelsinkiOIDCProvider(OAuth2Provider):
     id = 'helsinki_oidc'
     name = 'City of Helsinki employees (OIDC)'
-    package = 'helusers.providers.helsinki_oidc'
+    package = 'tunnistamo_users.providers.helsinki_oidc'
     account_class = HelsinkiOIDCAccount
 
     def extract_uid(self, data):

@@ -14,8 +14,8 @@ if hasattr(settings, 'SITE_TYPE'):
 
 
 PROVIDERS = (
-    ('helusers.providers.helsinki', 'helsinki_login'),
-    ('helusers.providers.helsinki_oidc', 'helsinki_oidc_login')
+    ('tunnistamo_users.providers.helsinki', 'helsinki_login'),
+    ('tunnistamo_users.providers.helsinki_oidc', 'helsinki_oidc_login')
 )
 
 
@@ -42,7 +42,7 @@ class AdminSite(admin.AdminSite):
         ret['site_type'] = getattr(settings, 'SITE_TYPE', 'dev')
         ret['redirect_path'] = request.GET.get('next', None)
         provider_installed = False
-        if 'helusers.tunnistamo_oidc.TunnistamoOIDCAuth' in settings.AUTHENTICATION_BACKENDS:
+        if 'tunnistamo_users.tunnistamo_oidc.TunnistamoOIDCAuth' in settings.AUTHENTICATION_BACKENDS:
             provider_installed = True
             login_url = reverse('social:begin', kwargs=dict(backend='tunnistamo'))
         else:

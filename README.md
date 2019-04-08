@@ -19,7 +19,7 @@ Second, implement your own custom User model in your application's
 
 # users/models.py
 
-from helusers.models import AbstractUser
+from tunnistamo_users.models import AbstractUser
 
 
 class User(AbstractUser):
@@ -29,24 +29,24 @@ class User(AbstractUser):
 ### Configuration of the auth provider
 
 - Add `social-auth-app-django` to your `requirements.in` or `requirements.txt` file and install the package.
-- Add `helusers` and `social_django` to the `INSTALLED_APPS` setting:
+- Add `tunnistamo_users` and `social_django` to the `INSTALLED_APPS` setting:
 
 ```python
 INSTALLED_APPS = (
-    'helusers',
+    'tunnistamo_users',
     ...
     'social_django',
     ...
 )
 ```
 
-***Note*** `helusers` must be the first one in the list to properly override the default admin site templates.
+***Note*** `tunnistamo_users` must be the first one in the list to properly override the default admin site templates.
 
 - Configure the following settings:
 
 ```python
 AUTHENTICATION_BACKENDS = (
-    'helusers.tunnistamo_oidc.TunnistamoOIDCAuth',
+    'tunnistamo_users.tunnistamo_oidc.TunnistamoOIDCAuth',
     'django.contrib.auth.backends.ModelBackend',
 )
 
@@ -64,7 +64,7 @@ code.
 When that setting is in place, languages can be requested using query param `ui_locales=<language code>` when starting
 the login process, for example in your template
 ```
-<a href="{% url 'helusers:auth_login' %}?next=/foobar/&ui_locales=en">Login in English</a>
+<a href="{% url 'tunnistamo_users:auth_login' %}?next=/foobar/&ui_locales=en">Login in English</a>
 ```
 
 - Add URLs entries (to `<project>/urls.py`):
@@ -88,7 +88,7 @@ SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT = TUNNISTAMO_BASE_URL + '/openid'
 
 - Set the session serializer to PickleSerializer
 
-helusers stores the access token expiration time as a datetime which is not
+tunnistamo_users stores the access token expiration time as a datetime which is not
 serializable to JSON, so Django needs to be configured to use the built-in
 PickeSerializer:
 
@@ -103,7 +103,7 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 ```python
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'helusers.oidc.ApiTokenAuthentication',
+        'tunnistamo_users.oidc.ApiTokenAuthentication',
     ),
 }
 ```
@@ -122,14 +122,14 @@ OIDC_API_TOKEN_AUTH = {
 ### Context processor
 
 If you need to access the Tunnistamo API from your JS code, you can include
-the Tunnistamo base URL in your template context using helusers's context processor:
+the Tunnistamo base URL in your template context using tunnistamo_users's context processor:
 
 ```python
 TEMPLATES = [
     {
         'OPTIONS': {
             'context_processors': [
-                'helusers.context_processors.settings'
+                'tunnistamo_users.context_processors.settings'
             ]
         }
     }
