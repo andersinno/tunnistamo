@@ -12,6 +12,8 @@ urlpatterns = [
         kwargs={'backend': 'helsinki_adfs'}),
     url(r'^adfs/espoo/login/callback/$', views.complete, name='complete_espoo_adfs',
         kwargs={'backend': 'espoo_adfs'}),
+    url(r'^adfs/tampere/login/callback/$', views.complete, name='complete_tampere_adfs',
+        kwargs={'backend': 'tampere_adfs'}),
     url(r'^(?P<backend>[^/]+)/login/callback/$', views.complete, name='complete'),
     # disconnection
     url(r'^disconnect/(?P<backend>[^/]+)/$', views.disconnect, name='disconnect'),
