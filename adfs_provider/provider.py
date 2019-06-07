@@ -65,3 +65,13 @@ class EspooADFSProvider(ADFSProvider):
 
 
 providers.registry.register(EspooADFSProvider)
+
+
+class TampereADFSProvider(ADFSProvider):
+    id = 'tampere_adfs'
+    name = 'Tampere ADFS'
+    resource = 'https://auth.tampere.fi/adfs'
+    domain_uuid = uuid.UUID('405f4629-a825-4d2b-b1e8-e7702f291e1c')
+
+
+providers.registry.register(TampereADFSProvider)

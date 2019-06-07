@@ -7,6 +7,7 @@ from django.http import HttpResponse
 from django.urls import include, path, re_path
 from django.utils import translation
 from django.views.defaults import permission_denied
+from django.views.generic import TemplateView
 from oidc_provider.views import ProviderInfoView as OIDCProviderInfoView
 from rest_framework.documentation import include_docs_urls
 from rest_framework.routers import SimpleRouter
@@ -60,6 +61,7 @@ v1_scope_path = path('scope/', ScopeListView.as_view(), name='scope-list')
 v1_api_path = path('v1/', include((router.urls + [v1_scope_path], 'v1')))
 
 urlpatterns = [
+    path('', TemplateView.as_view(template_name='tampere_theme/index.html')),
     path('admin/', admin.site.urls),
     path('api-tokens/', get_api_tokens_view),
     path('accounts/profile/', show_login),
