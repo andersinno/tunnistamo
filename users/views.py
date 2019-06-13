@@ -1,4 +1,5 @@
 import re
+from pydoc import locate
 from urllib.parse import parse_qs, urlparse
 
 from django.conf import settings
@@ -7,8 +8,12 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import translation
 from django.utils.http import quote
+from django.views.generic import View
 from django.views.generic.base import TemplateView
+from jwkest.jws import JWT
 from oauth2_provider.models import get_application_model
+from oidc_provider.lib.endpoints.token import TokenEndpoint
+from oidc_provider.lib.errors import TokenError, UserAuthError
 from oidc_provider.lib.utils.token import client_id_from_id_token
 from oidc_provider.models import Client, Token
 from oidc_provider.views import AuthorizeView, EndSessionView
@@ -146,7 +151,7 @@ class TunnistamoOidcAuthorizeView(AuthorizeView):
 
 
 class TunnistamoOidcEndSessionView(EndSessionView):
-    def get(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
         # check if the authenticated user has active Suomi.fi login
         user = request.user
         social_user = None
@@ -158,7 +163,7 @@ class TunnistamoOidcEndSessionView(EndSessionView):
             except UserSocialAuth.DoesNotExist:
                 pass
         # clear Django session and get redirect URL
-        response = super().get(request, *args, **kwargs)
+        response = super().dispatch(request, *args, **kwargs)
         # create Suomi.fi logout redirect if needed
         if social_user is not None:
             response = self._create_suomifi_logout_response(social_user, user, request, response.url)
@@ -196,6 +201,32 @@ class TunnistamoOidcEndSessionView(EndSessionView):
                 token.delete()
 
         return response
+
+
+class TunnistamoOidcTokenView(View):
+    def post(self, request, *args, **kwargs):
+        token = TokenEndpoint(request)
+
+        try:
+            token.validate_params()
+
+            dic = token.create_response_dic()
+
+            # Django OIDC Provider doesn't support refresh token expiration (#230).
+            # We don't supply refresh tokens when using restricted authentication methods.
+            amr = JWT().unpack(dic['id_token']).payload().get('amr', '')
+            for restricted_auth in settings.RESTRICTED_AUTHENTICATION_BACKENDS:
+                if amr == locate(restricted_auth).name:
+                    dic.pop('refresh_token')
+                    break
+
+            response = TokenEndpoint.response(dic)
+            return response
+
+        except TokenError as error:
+            return TokenEndpoint.response(error.create_dict(), status=400)
+        except UserAuthError as error:
+            return TokenEndpoint.response(error.create_dict(), status=403)
 
 
 def _extend_scope_in_query_params(query_params):
