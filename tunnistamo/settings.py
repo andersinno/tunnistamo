@@ -54,6 +54,8 @@ INSTALLED_APPS = (
     'tampere_theme',
     'bootstrap3',
 
+    'sanitized_dump',
+
     'helusers',
 
     'yletunnus',
