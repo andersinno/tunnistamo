@@ -58,6 +58,8 @@ INSTALLED_APPS = (
     'crequest',
     'django_filters',
 
+    'sanitized_dump',
+
     'helusers',
 
     'yletunnus',
