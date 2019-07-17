@@ -9,6 +9,7 @@ pyjwt
 django-helusers
 django-allauth
 django-bootstrap3
+django-sanitized-dump
 psycopg2
 --no-binary psycopg2
 raven

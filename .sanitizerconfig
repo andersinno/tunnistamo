@@ -1,0 +1,364 @@
+config:
+  addons: []
+strategy:
+  account_emailaddress:
+    email: user.email
+    id: null
+    primary: null
+    user_id: null
+    verified: null
+  account_emailconfirmation:
+    created: null
+    email_address_id: null
+    id: null
+    key: string.random
+    sent: null
+  adfs_provider_adfsattributemapping:
+    id: null
+    in_name: null
+    out_name: null
+    realm_id: null
+  adfs_provider_adfsrealm:
+    adfs_url: null
+    app_id: null
+    certificate: null
+    id: null
+    name: null
+  auth_backends_suomifiaccesslevel:
+    id: null
+    shorthand: null
+  auth_backends_suomifiaccesslevel_attributes:
+    id: null
+    suomifiaccesslevel_id: null
+    suomifiuserattribute_id: null
+  auth_backends_suomifiaccesslevel_translation:
+    description: null
+    id: null
+    language_code: null
+    master_id: null
+    name: null
+  auth_backends_suomifiuserattribute:
+    description: null
+    friendly_name: null
+    id: null
+    name: null
+    uri: null
+  auth_group:
+    id: null
+    name: null
+  auth_group_permissions:
+    group_id: null
+    id: null
+    permission_id: null
+  auth_permission:
+    codename: null
+    content_type_id: null
+    id: null
+    name: null
+  devices_interfacedevice:
+    id: null
+    scopes: null
+    secret_key: string.random
+  devices_userdevice:
+    app_version: string.empty
+    auth_counter: null
+    device_model: string.empty
+    id: null
+    last_used_at: times.random_past_timestamp
+    os: string.empty
+    os_version: string.empty
+    public_key: string.random
+    secret_key: string.random
+    user_id: null
+  django_admin_log:
+    action_flag: null
+    action_time: null
+    change_message: string.empty
+    content_type_id: null
+    id: null
+    object_id: null
+    object_repr: string.empty
+    user_id: null
+  django_content_type:
+    app_label: null
+    id: null
+    model: null
+  django_session:
+    expire_date: null
+    session_data: string.empty
+    session_key: string.random
+  django_site:
+    domain: null
+    id: null
+    name: null
+  helusers_adgroup:
+    display_name: null
+    id: null
+    name: null
+  helusers_adgroupmapping:
+    ad_group_id: null
+    group_id: null
+    id: null
+  hkijwt_apptoapppermission:
+    id: null
+    requester_id: null
+    target_id: null
+  identities_useridentity:
+    id: null
+    identifier: string.random
+    service: null
+    user_id: null
+  key_manager_managedrsakey:
+    created_at: null
+    expired_at: null
+    id: null
+    rsakey_id: null
+  oauth2_provider_accesstoken:
+    application_id: null
+    created: null
+    expires: null
+    id: null
+    scope: null
+    source_refresh_token_id: null
+    token: string.random
+    updated: null
+    user_id: null
+  oauth2_provider_grant:
+    application_id: null
+    code: string.random
+    created: null
+    expires: null
+    id: null
+    redirect_uri: null
+    scope: null
+    updated: null
+    user_id: null
+  oauth2_provider_refreshtoken:
+    access_token_id: null
+    application_id: null
+    created: null
+    id: null
+    revoked: null
+    token: string.random
+    updated: null
+    user_id: null
+  oidc_apis_api:
+    domain_id: null
+    id: null
+    name: null
+    oidc_client_id: null
+    required_scopes: null
+  oidc_apis_apidomain:
+    id: null
+    identifier: null
+  oidc_apis_apiscope:
+    api_id: null
+    id: null
+    identifier: null
+    specifier: null
+  oidc_apis_apiscope_allowed_apps:
+    apiscope_id: null
+    client_id: null
+    id: null
+  oidc_apis_apiscopetranslation:
+    description: null
+    id: null
+    language_code: null
+    master_id: null
+    name: null
+  oidc_provider_client:
+    _post_logout_redirect_uris: null
+    _redirect_uris: null
+    _scope: null
+    client_id: null
+    client_secret: string.random
+    client_type: null
+    contact_email: user.email
+    date_created: null
+    id: null
+    jwt_alg: null
+    logo: null
+    name: null
+    owner_id: null
+    require_consent: null
+    reuse_consent: null
+    terms_url: null
+    website_url: null
+  oidc_provider_client_response_types:
+    client_id: null
+    id: null
+    responsetype_id: null
+  oidc_provider_code:
+    _scope: null
+    client_id: null
+    code: string.random
+    code_challenge: string.random
+    code_challenge_method: null
+    expires_at: null
+    id: null
+    is_authentication: null
+    nonce: string.random
+    user_id: null
+  oidc_provider_responsetype:
+    description: null
+    id: null
+    value: null
+  oidc_provider_rsakey:
+    id: null
+    key: string.random
+  oidc_provider_token:
+    _id_token: constant.empty_json_dict
+    _scope: null
+    access_token: string.random
+    client_id: null
+    expires_at: null
+    id: null
+    refresh_token: string.random
+    user_id: null
+  oidc_provider_userconsent:
+    _scope: null
+    client_id: null
+    date_given: times.random_past_timestamp
+    expires_at: times.random_past_timestamp
+    id: null
+    user_id: null
+  services_service:
+    application_id: null
+    client_id: null
+    id: null
+    image: null
+  services_service_translation:
+    description: null
+    id: null
+    language_code: null
+    master_id: null
+    name: null
+    url: null
+  social_auth_association:
+    assoc_type: null
+    handle: null
+    id: null
+    issued: null
+    lifetime: null
+    secret: string.random
+    server_url: null
+  social_auth_code:
+    code: string.random
+    email: user.email
+    id: null
+    timestamp: null
+    verified: null
+  social_auth_nonce:
+    id: null
+    salt: string.random
+    server_url: null
+    timestamp: null
+  social_auth_partial:
+    backend: null
+    data: string.empty
+    id: null
+    next_step: null
+    timestamp: null
+    token: string.random
+  social_auth_usersocialauth:
+    extra_data: constant.empty_json_dict
+    id: null
+    provider: null
+    uid: string.random
+    user_id: null
+  socialaccount_socialaccount:
+    date_joined: times.random_past_timestamp
+    extra_data: constant.empty_json_dict
+    id: null
+    last_login: null
+    provider: null
+    uid: string.random
+    user_id: null
+  socialaccount_socialapp:
+    client_id: null
+    id: null
+    key: string.random
+    name: null
+    provider: null
+    secret: string.random
+  socialaccount_socialapp_sites:
+    id: null
+    site_id: null
+    socialapp_id: null
+  socialaccount_socialtoken:
+    account_id: null
+    app_id: null
+    expires_at: null
+    id: null
+    token: string.random
+    token_secret: string.random
+  users_application:
+    authorization_grant_type: null
+    client_id: null
+    client_secret: string.random
+    client_type: null
+    created: null
+    id: null
+    include_ad_groups: null
+    name: null
+    redirect_uris: null
+    site_type: null
+    skip_authorization: null
+    updated: null
+    user_id: null
+  users_application_login_methods:
+    application_id: null
+    id: null
+    loginmethod_id: null
+  users_loginmethod:
+    background_color: null
+    id: null
+    logo_url: null
+    name: null
+    order: null
+    provider_id: null
+    short_description: null
+  users_oidcclientoptions:
+    id: null
+    include_ad_groups: null
+    oidc_client_id: null
+    site_type: null
+  users_oidcclientoptions_login_methods:
+    id: null
+    loginmethod_id: null
+    oidcclientoptions_id: null
+  users_user:
+    date_joined: times.random_past_timestamp
+    department_name: null
+    email: user.email
+    first_name: user.given_name_en_gb
+    id: null
+    is_active: null
+    is_staff: null
+    is_superuser: null
+    last_login: constant.null
+    last_login_backend: null
+    last_name: user.surname_en_gb
+    password: constant.invalid_django_password
+    primary_sid: null
+    username: user.username
+    uuid: derived.uuid4
+  users_user_ad_groups:
+    adgroup_id: null
+    id: null
+    user_id: null
+  users_user_groups:
+    group_id: null
+    id: null
+    user_id: null
+  users_user_user_permissions:
+    id: null
+    permission_id: null
+    user_id: null
+  users_userloginentry:
+    geo_location: constant.null
+    id: null
+    ip_address: constant.null
+    service_id: null
+    timestamp: times.random_past_timestamp
+    user_id: null
